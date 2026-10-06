@@ -1,0 +1,110 @@
+<div style="font-family: sans-serif; background-color: #f4f6f9; min-height: 100vh;">
+
+  <header style="background-color: #1e293b; color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="margin: 0; font-size: 1.5rem; font-weight: 600;">🎓 Campus Hub Portal</h1>
+    <nav style="display: flex; gap: 10px;">
+      <button (click)="switchTab('notices')" [style.background-color]="activeTab === 'notices' ? '#3b82f6' : 'transparent'" style="color: white; border: 1px solid #3b82f6; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        📢 Notice Board
+      </button>
+      <button (click)="switchTab('canteen')" [style.background-color]="activeTab === 'canteen' ? '#10b981' : 'transparent'" style="color: white; border: 1px solid #10b981; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        🍔 Canteen Menu
+      </button>
+    </nav>
+  </header>
+
+  <main style="padding: 30px;">
+
+    @if (activeTab === 'notices') {
+    <div>
+      <h2 style="color: #334155; margin-top: 0; margin-bottom: 20px;">Campus Notice Board</h2>
+
+      <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; max-width: 500px;">
+        <h3 style="margin-top: 0; color: #444;">Post New Notice</h3>
+        <div style="margin-bottom: 12px;">
+          <input type="text" [(ngModel)]="newTitle" placeholder="Notice Title" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <textarea [(ngModel)]="newDescription" placeholder="Notice details..." rows="3" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; resize: none;"></textarea>
+        </div>
+        <button (click)="createNotice()" style="background-color: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">Publish</button>
+      </div>
+
+      <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+        @for (item of notices; track item.id) {
+        <div style="background: white; border-left: 5px solid #3b82f6; padding: 20px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="margin: 0 0 10px 0; color: #1e293b;">{{ item.title }}</h3>
+            <p style="color: #475569; line-height: 1.5; margin: 0 0 15px 0;">{{ item.description }}</p>
+          </div>
+          <button (click)="deleteNotice(item.id)" style="align-self: flex-end; background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold; font-size: 0.9rem; padding: 5px 0;">
+            🗑️ Delete Notice
+          </button>
+        </div>
+        } @empty {
+        <p style="color: #64748b;">No active notices available.</p>
+        }
+      </div>
+    </div>
+    }
+
+    @if (activeTab === 'canteen') {
+    <div>
+      <h2 style="color: #334155; margin-top: 0; margin-bottom: 20px;">Canteen Management</h2>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start;">
+
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; min-width: 300px; max-width: 450px;">
+          <h3 style="margin-top: 0; color: #444;">Add New Menu Item</h3>
+          <div style="margin-bottom: 12px; display: flex; gap: 10px;">
+            <input type="text" [(ngModel)]="newItemName" placeholder="Item Name (e.g. Samosa)" style="flex: 2; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <input type="number" [(ngModel)]="newItemPrice" placeholder="Price (₹)" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <input type="text" [(ngModel)]="newItemCategory" placeholder="Category (e.g. Snacks, Drinks, Meals)" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box;">
+          </div>
+          <button (click)="createCanteenItem()" style="background-color: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">Add Item to Menu</button>
+        </div>
+
+        <div style="flex: 2; min-width: 350px;">
+
+          <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;">
+            <input type="text" [(ngModel)]="searchQuery" placeholder="🔍 Search dishes..." style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; width: 250px; font-size: 0.95rem;">
+
+            <div style="display: flex; gap: 8px;">
+              <button (click)="selectedCategory = 'All'" [style.background-color]="selectedCategory === 'All' ? '#475569' : '#e2e8f0'" [style.color]="selectedCategory === 'All' ? 'white' : '#475569'" style="border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: 500;">All</button>
+              <button (click)="selectedCategory = 'Snacks'" [style.background-color]="selectedCategory === 'Snacks' ? '#475569' : '#e2e8f0'" [style.color]="selectedCategory === 'Snacks' ? 'white' : '#475569'" style="border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: 500;">Snacks</button>
+              <button (click)="selectedCategory = 'Drinks'" [style.background-color]="selectedCategory === 'Drinks' ? '#475569' : '#e2e8f0'" [style.color]="selectedCategory === 'Drinks' ? 'white' : '#475569'" style="border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: 500;">Drinks</button>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            @for (dish of filteredCanteenItems; track dish.id) {
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #10b981;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                  <h3 style="margin: 0; color: #1e293b; font-size: 1.15rem;">{{ dish.itemName }}</h3>
+                  <span style="background-color: #d1fae5; color: #065f46; font-weight: bold; padding: 4px 8px; border-radius: 20px; font-size: 0.85rem;">₹{{ dish.price }}</span>
+                </div>
+                <span style="font-size: 0.8rem; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; color: #475569; font-weight: 500;">
+                                            📁 {{ dish.category }}
+                                        </span>
+              </div>
+
+              <button (click)="deleteCanteenItem(dish.id)" style="align-self: flex-end; background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold; font-size: 0.85rem; margin-top: 15px; padding: 5px 0;">
+                🗑️ Remove Item
+              </button>
+            </div>
+            } @empty {
+            <div style="grid-column: 1/-1; text-align: center; padding: 30px; background: white; border-radius: 8px; color: #64748b;">
+              No items match your criteria.
+            </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+    }
+
+  </main>
+</div>
